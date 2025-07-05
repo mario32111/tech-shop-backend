@@ -13,4 +13,4 @@ RUN npm rebuild bcrypt --unsafe-perm
 
 COPY ./dist ./src
 
-CMD ["node", "src/main.js"]
+CMD ["pnpm", "run", "start:dev"]

@@ -2,90 +2,154 @@ version: '3.7'
 
 services:
   app:
-    image: app_vuelos:v2
-    container_name: app_vuelos
-    build: 
+    image: app_vuelos:dev
+    container_name: app_vuelos_dev
+    build:
       context: ./superFlights-apiGateway
       dockerfile: Dockerfile
     env_file: .env
     ports:
       - 80:3000
     depends_on:
-      - mongodb
       - rabbitmq
-    restart: always
     networks:
-      - ms_nestjs
+      - ms_nestjs_dev
+    volumes:
+      - ./superFlights-apiGateway:/app
+      - /app/node_modules
+    command: pnpm run start:dev
 
-  microservice-flights:
-    image: microservice-flights:v2
-    container_name: microservice-flights
-    build: 
-      context: ./superFlights-microserviceFlights
+  microservice-products:
+    image: microservice-products:dev
+    container_name: microservice-products_dev
+    build:
+      context: ./superFlights-microserviceProducts
       dockerfile: Dockerfile
     env_file: .env
     depends_on:
-      - mongodb
       - rabbitmq
+      - postgres_products
     restart: always
     networks:
-      - ms_nestjs
-
-  microservice-passengers:
-    image: microservice-passengers:v2
-    container_name: microservice-passengers
-    build: 
-      context: ./superFlights-microservicePassengers
-      dockerfile: Dockerfile
-    env_file: .env
-    depends_on:
-      - mongodb
-      - rabbitmq
-    restart: always
-    networks:
-      - ms_nestjs
-
+      - ms_nestjs_dev
+    volumes:
+      - ./superFlights-microserviceProducts:/app
+      - /app/node_modules
+    command: pnpm run start:dev
 
   microservice-users:
-    image: microservice-users:v2
-    container_name: microservice-users
-    build: 
+    image: microservice-users:dev
+    container_name: microservice-users_dev
+    build:
       context: ./superFlights-microserviceUsers
       dockerfile: Dockerfile
     env_file: .env
     depends_on:
-      - mongodb
       - rabbitmq
+      - postgres_users
     restart: always
     networks:
-      - ms_nestjs
+      - ms_nestjs_dev
+    volumes:
+      - ./superFlights-microserviceUsers:/app
+      - /app/node_modules
+    command: pnpm run start:dev
+
+  microservice-auth:
+    image: microservice-auth:dev
+    container_name: microservice_auth_dev
+    build:
+      context: ./superFlights-microserviceAuth
+      dockerfile: Dockerfile
+    env_file: .env
+    depends_on:
+      - rabbitmq
+      - postgres_auth
+    restart: always
+    networks:
+      - ms_nestjs_dev
+    volumes:
+      - ./superFlights-microserviceAuth:/app
+      - /app/node_modules
+    command: pnpm run start:dev
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rmq
+    container_name: rmq_dev
     expose:
       - 5672
       - 15672
     restart: always
     networks:
-      - ms_nestjs
+      - ms_nestjs_dev
 
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
+  # --- Instancias de PostgreSQL dedicadas por Microservicio ---
+  postgres_users:
+    image: postgres:latest
+    container_name: postgres_users_db_dev
     restart: always
     environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
+      POSTGRES_DB: users_db
+      POSTGRES_USER: user_users
+      POSTGRES_PASSWORD: password_users
     volumes:
-      - mongodb:/data/db
+      - postgres_users_data_dev:/var/lib/postgresql/data
     expose:
-      - 27017
+      - 5432
     networks:
-      - ms_nestjs
+      - ms_nestjs_dev
+
+  postgres_products:
+    image: postgres:latest
+    container_name: postgres_products_db_dev
+    restart: always
+    environment:
+      POSTGRES_DB: products_db
+      POSTGRES_USER: user_products
+      POSTGRES_PASSWORD: password_products
+    volumes:
+      - postgres_products_data_dev:/var/lib/postgresql/data
+    expose:
+      - 5432
+    networks:
+      - ms_nestjs_dev
+
+  postgres_auth:
+    image: postgres:latest
+    container_name: postgres_auth_db_dev
+    restart: always
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: user_auth
+      POSTGRES_PASSWORD: password_auth
+    volumes:
+      - postgres_auth_data_dev:/var/lib/postgresql/data
+    expose:
+      - 5432
+    networks:
+      - ms_nestjs_dev
+
+  # --- Servicio de pgAdmin ---
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_dev
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: 12345
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres_users
+      - postgres_products
+      - postgres_auth
+    networks:
+      - ms_nestjs_dev
 
 volumes:
-  mongodb:
+  postgres_users_data_dev:
+  postgres_products_data_dev:
+  postgres_auth_data_dev:
 
 networks:
-  ms_nestjs:
+  ms_nestjs_dev:

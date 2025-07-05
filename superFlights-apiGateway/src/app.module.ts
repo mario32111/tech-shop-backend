@@ -15,7 +15,7 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
     }),
     UserModule,
-    PassengerModule,
+    //PassengerModule,
     FlightModule,
     ProxyModule,
     AuthModule
