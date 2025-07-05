@@ -6,11 +6,11 @@ import { IUser } from 'src/common/interface/user.interface';
 import { UserMsg } from 'src/common/constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
+import { JwtAuthGuard } from 'src/common/authGuards/jwt.auth.guard';
 
 @ApiTags('users')
 @UseGuards(JwtAuthGuard)
-@Controller('api/v2/user')
+@Controller('api/v1/user')
 export class UserController {
     //Declara una propiedad privada para almacenar la instancia de ClientProxy, 
     //que se utiliza para comunicarse con el microservicio de usuarios.

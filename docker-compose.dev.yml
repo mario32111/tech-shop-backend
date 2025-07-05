@@ -5,7 +5,7 @@ services:
     image: app_vuelos:dev
     container_name: app_vuelos_dev
     build:
-      context: ./superFlights-apiGateway
+      context: ./apiGateway
       dockerfile: Dockerfile
     env_file: .env
     ports:
@@ -15,7 +15,7 @@ services:
     networks:
       - ms_nestjs_dev
     volumes:
-      - ./superFlights-apiGateway:/app
+      - ./apiGateway:/app
       - /app/node_modules
     command: pnpm run start:dev
 
@@ -23,7 +23,7 @@ services:
     image: microservice-products:dev
     container_name: microservice-products_dev
     build:
-      context: ./superFlights-microserviceProducts
+      context: ./microserviceProducts
       dockerfile: Dockerfile
     env_file: .env
     depends_on:
@@ -33,7 +33,7 @@ services:
     networks:
       - ms_nestjs_dev
     volumes:
-      - ./superFlights-microserviceProducts:/app
+      - ./microserviceProducts:/app
       - /app/node_modules
     command: pnpm run start:dev
 
@@ -41,7 +41,7 @@ services:
     image: microservice-users:dev
     container_name: microservice-users_dev
     build:
-      context: ./superFlights-microserviceUsers
+      context: ./microserviceUsers
       dockerfile: Dockerfile
     env_file: .env
     depends_on:
@@ -51,7 +51,7 @@ services:
     networks:
       - ms_nestjs_dev
     volumes:
-      - ./superFlights-microserviceUsers:/app
+      - ./microserviceUsers:/app
       - /app/node_modules
     command: pnpm run start:dev
 
@@ -59,7 +59,7 @@ services:
     image: microservice-auth:dev
     container_name: microservice_auth_dev
     build:
-      context: ./superFlights-microserviceAuth
+      context: ./microserviceAuth
       dockerfile: Dockerfile
     env_file: .env
     depends_on:
@@ -69,19 +69,20 @@ services:
     networks:
       - ms_nestjs_dev
     volumes:
-      - ./superFlights-microserviceAuth:/app
+      - ./microserviceAuth:/app
       - /app/node_modules
     command: pnpm run start:dev
 
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rmq_dev
-    expose:
-      - 5672
-      - 15672
+    ports:
+      - "5672:5672"   # Puerto AMQP para la comunicación de los microservicios
+      - "15672:15672" # Puerto para el panel de administración web
     restart: always
     networks:
       - ms_nestjs_dev
+
 
   # --- Instancias de PostgreSQL dedicadas por Microservicio ---
   postgres_users:

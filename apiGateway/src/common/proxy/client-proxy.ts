@@ -4,7 +4,7 @@ import { ClientProxy, ClientProxyFactory, Transport, RmqOptions } from "@nestjs/
 import { RabbitMQ } from "../constants";
 
 @Injectable()
-export class ClientProxySuperFlights {
+export class ClientProxyTechShop {
     constructor(private readonly config: ConfigService) {}
 
     // Generar la conexión y configuración de RabbitMQ para usuarios
@@ -21,24 +21,24 @@ export class ClientProxySuperFlights {
     }
 
     // Generar la conexión y configuración de RabbitMQ para pasajeros   
-    clientProxyPassengers(): ClientProxy {
+    clientProxyProducts(): ClientProxy {
         return ClientProxyFactory.create({
             transport: Transport.RMQ,
             options: {
                 urls: [this.config.get<string>('AMQP_URL')], // Convertir en array
-                queue: RabbitMQ.PassengerQueue,
+                queue: RabbitMQ.ProductQueue,
                 queueOptions: { durable: true },
             }
         } as RmqOptions);
     }
 
     // Generar la conexión y configuración de RabbitMQ para vuelos
-    clientProxyFlights(): ClientProxy {
+    clientProxyAuth(): ClientProxy {
         return ClientProxyFactory.create({
             transport: Transport.RMQ,
             options: {
                 urls: [this.config.get<string>('AMQP_URL')], // Convertir en array
-                queue: RabbitMQ.FlightQueue,
+                queue: RabbitMQ.AuthQueue,
                 queueOptions: { durable: true },
             }
         } as RmqOptions);

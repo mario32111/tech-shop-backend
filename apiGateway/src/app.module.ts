@@ -3,9 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
-import { PassengerModule } from './passenger/passenger.module';
-import { FlightModule } from './flight/flight.module';
-import { ProxyModule } from './common/proxy/proxy.module'; // Importa el ProxyModule
+import { ProductModule } from './product/product.module';
+import { ProxyModule } from './common/proxy/proxy.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -15,8 +14,7 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
     }),
     UserModule,
-    //PassengerModule,
-    FlightModule,
+    ProductModule,
     ProxyModule,
     AuthModule
   ],
