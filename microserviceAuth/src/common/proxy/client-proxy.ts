@@ -1,45 +1,43 @@
-// apiGateway/src/common/proxy/client-proxy.ts
-
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config"; // Asegúrate de que ConfigService esté importado
+import { ConfigService } from "@nestjs/config";
 import { ClientProxy, ClientProxyFactory, Transport, RmqOptions } from "@nestjs/microservices";
 import { RabbitMQ } from "../constants";
 
 @Injectable()
 export class ClientProxyTechShop {
-    constructor(private readonly config: ConfigService) { } // ConfigService inyectado
+    constructor(private readonly config: ConfigService) {}
 
     // Generar la conexión y configuración de RabbitMQ para usuarios
     clientProxyUsers(): ClientProxy {
+
         return ClientProxyFactory.create({
             transport: Transport.RMQ,
             options: {
-                urls: [this.config.get<string>('AMQP_URL')], // Correcto: usa ConfigService
+                urls: [this.config.get<string>('AMQP_URL')], // Convertir en array
                 queue: RabbitMQ.UserQueue,
-                queueOptions: { durable: true },
+                queueOptions: { durable: true }, // Opcional, para mantener mensajes persistentes
             }
         } as RmqOptions);
     }
 
-    // Generar la conexión y configuración de RabbitMQ para productos
+    // Generar la conexión y configuración de RabbitMQ para pasajeros   
     clientProxyProducts(): ClientProxy {
         return ClientProxyFactory.create({
             transport: Transport.RMQ,
             options: {
-                urls: [this.config.get<string>('AMQP_URL')], // Correcto: usa ConfigService
+                urls: [this.config.get<string>('AMQP_URL')], // Convertir en array
                 queue: RabbitMQ.ProductQueue,
                 queueOptions: { durable: true },
             }
         } as RmqOptions);
     }
 
-    // Generar la conexión y configuración de RabbitMQ para autenticación
+    // Generar la conexión y configuración de RabbitMQ para vuelos
     clientProxyAuth(): ClientProxy {
         return ClientProxyFactory.create({
             transport: Transport.RMQ,
             options: {
-                // ¡CORRECCIÓN AQUÍ! Usa this.config.get() consistentemente
-                urls: [this.config.get<string>('AMQP_URL')],
+                urls: [this.config.get<string>('AMQP_URL')], // Convertir en array
                 queue: RabbitMQ.AuthQueue,
                 queueOptions: { durable: true },
             }

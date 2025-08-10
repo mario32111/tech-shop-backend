@@ -1,0 +1,86 @@
+version: '3.7'
+
+services:
+  app:
+    image: app_vuelos:dev
+    container_name: app_vuelos_dev
+    build:
+      context: ./apiGateway
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - 80:3000
+    depends_on:
+      - rabbitmq
+    networks:
+      - ms_nestjs_dev
+    volumes:
+      - ./apiGateway:/app
+      - /app/node_modules
+    command: pnpm run start:dev
+
+  microservice-auth:
+    image: microservice-auth:dev
+    container_name: microservice_auth_dev
+    build:
+      context: ./microserviceAuth
+      dockerfile: Dockerfile
+    env_file: .env
+    depends_on:
+      - rabbitmq
+      - postgres_auth
+    restart: always
+    networks:
+      - ms_nestjs_dev
+    volumes:
+      - ./microserviceAuth:/app
+      - /app/node_modules
+    command: pnpm run start:dev
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rmq_dev
+    ports:
+      - "5672:5672"   # Puerto AMQP para la comunicación de los microservicios
+      - "15672:15672" # Puerto para el panel de administración web
+    restart: always
+    networks:
+      - ms_nestjs_dev
+
+
+
+  postgres_auth:
+    image: postgres:latest
+    container_name: postgres_auth_db_dev
+    restart: always
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: user_auth
+      POSTGRES_PASSWORD: password_auth
+    volumes:
+      - postgres_auth_data_dev:/var/lib/postgresql/data
+    expose:
+      - 5432
+    networks:
+      - ms_nestjs_dev
+
+  # --- Servicio de pgAdmin ---
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_dev
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: 12345
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres_auth
+    networks:
+      - ms_nestjs_dev
+
+volumes:
+  postgres_auth_data_dev:
+
+networks:
+  ms_nestjs_dev:

@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { ClientProxySuperFlights } from 'src/common/proxy/client-proxy';
+import { ClientProxyTechShop } from 'src/common/proxy/client-proxy';
 import { UserDto } from './dto/user.dto';
 import { Observable } from 'rxjs';
 import { IUser } from 'src/common/interface/user.interface';
@@ -12,7 +12,7 @@ import { ApiTags } from '@nestjs/swagger';
 export class UserController {
     private _clientProxyUser: ClientProxy;
 
-    constructor(private readonly clientProxy: ClientProxySuperFlights) {
+    constructor(private readonly clientProxy: ClientProxyTechShop) {
         this._clientProxyUser = this.clientProxy.clientProxyUsers();
     }
 

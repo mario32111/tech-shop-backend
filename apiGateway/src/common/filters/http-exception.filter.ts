@@ -3,25 +3,27 @@ import { error, timeStamp } from "console";
 import path from "path";
 
 @Catch()
-export class AllExceptionFilter implements ExceptionFilter{
-    private readonly logger= new Logger(AllExceptionFilter.name);
+export class AllExceptionFilter implements ExceptionFilter {
+    private readonly logger = new Logger(AllExceptionFilter.name);
 
     catch(exception: any, host: ArgumentsHost) {
-        const ctx= host.switchToHttp();
-        const res= ctx.getResponse();
-        const req= ctx.getRequest();
+        const ctx = host.switchToHttp();
+        const res = ctx.getResponse();
+        const req = ctx.getRequest();
 
-        const status= exception instanceof HttpException? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR
+        const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR
 
-        const msg = exception instanceof HttpException ? exception.getResponse(): exception;
+        const msg = exception instanceof HttpException ? exception.getResponse() : exception;
 
-        this.logger.error(`Status ${status} Error: ${JSON.stringify(msg)}`)
-
+        this.logger.error('Full Exception Details:', exception);
+        this.logger.error(`Status ${status} Error: ${JSON.stringify(msg)}`);
         res.status(status).json({
             timeStamp: new Date().toISOString(),
             path: req.url,
             error: msg,
         })
+
+
     }
 
 }

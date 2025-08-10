@@ -11,6 +11,7 @@ RUN pnpm install --frozen-lockfile --production=false
 
 RUN npm rebuild bcrypt --unsafe-perm
 
-COPY ./dist ./src
-
 CMD ["pnpm", "run", "start:dev"]
+
+
+

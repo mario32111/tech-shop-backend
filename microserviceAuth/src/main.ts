@@ -9,7 +9,7 @@ async function bootstrap() {
       transport: Transport.RMQ,
       options: {
         urls: [process.env.AMQP_URL], // URL de RabbitMQ desde la variable de entorno
-        queue: RabbitMQ.PassengerQueue,    // Nombre de la cola que estás utilizando
+        queue: RabbitMQ.AuthQueue,    // Nombre de la cola que estás utilizando
       },
     });
 

@@ -1,4 +1,3 @@
-import { Controller } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ClientProxyTechShop } from 'src/common/proxy/client-proxy';
 import { Observable } from 'rxjs';
@@ -6,6 +5,11 @@ import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nes
 import { JwtAuthGuard } from 'src/common/authGuards/jwt.auth.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { LoginUserDto } from './dto/login-user.dto';
+import { AuthMsg } from 'src/common/constants';
+import { RegisterAuthUserDto } from './dto/register-auth-user.dto';
+import { ValidateTokenDto } from './dto/validate-token.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { LogoutDto } from './dto/logout.dto';
 
 
 @ApiTags('auth')
@@ -37,25 +41,25 @@ export class AuthController {
 
     @Post('login')
     login(@Body() LoginUserDto: LoginUserDto): Observable<any> {
-        return this.sendAndHandle<any>('LOGIN', LoginUserDto);
+        return this.sendAndHandle<any>(AuthMsg.LOGIN, LoginUserDto);
     }
     @Post('register')
-    register(@Body() registerUserDto: any): Observable<any> {
-        return this.sendAndHandle<any>('REGISTER', registerUserDto);
+    register(@Body() registerUserDto: RegisterAuthUserDto): Observable<any> {
+        return this.sendAndHandle<any>(AuthMsg.REGISTER, registerUserDto);
     }
 
     @Post('validate-token')
-    validateToken(@Body() tokenDto: any): Observable<any> {
-        return this.sendAndHandle<any>('VALIDATE_TOKEN', tokenDto);
+    validateToken(@Body() tokenDto: ValidateTokenDto): Observable<any> {
+        return this.sendAndHandle<any>(AuthMsg.VALIDATE_TOKEN, tokenDto);
     }
 
     @Post('refresh-token')
-    refreshToken(@Body() refreshTokenDto: any): Observable<any> {
-        return this.sendAndHandle<any>('REFRESH_TOKEN', refreshTokenDto);
+    refreshToken(@Body() refreshTokenDto: RefreshTokenDto): Observable<any> {
+        return this.sendAndHandle<any>(AuthMsg.REFRESH_TOKEN, refreshTokenDto);
     }
 
     @Post('logout')
-    logout(@Body() logoutDto: any): Observable<any> {
-        return this.sendAndHandle<any>('LOGOUT', logoutDto);
+    logout(@Body() logoutDto: LogoutDto): Observable<any> {
+        return this.sendAndHandle<any>(AuthMsg.LOGOUT, logoutDto);
     }
 }

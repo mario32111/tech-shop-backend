@@ -1,22 +1,50 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+// microserviceAuth/src/auth/auth.controller.ts
+
+import { Controller, UsePipes, ValidationPipe } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
-import { UserDto } from 'src/user/dto/user.dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
+import { RegisterAuthUserDto } from './dto/register-auth-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto'; // Importa el DTO
+import { ValidateTokenDto } from './dto/validate-token.dto'; // Importa el DTO
+import { LogoutDto } from './dto/logout.dto'; // Importa el DTO
+import { AuthMsg } from 'src/common/constants';
 
-@ApiTags('Authentication')
-@Controller('api/v2/auth')
+@Controller()
 export class AuthController {
-    constructor(private readonly authService: AuthService){}
+  constructor(private readonly authService: AuthService) {}
 
-    @UseGuards(LocalAuthGuard)
-    @Post('signin')
-    async signIn (@Req() req){
-        return await this.authService.signIn(req.user)
+  @MessagePattern(AuthMsg.LOGIN)
+  @UsePipes(new ValidationPipe())
+  async login(@Payload() loginUserDto: LoginUserDto) {
+    const user = await this.authService.validateUser(loginUserDto.email, loginUserDto.password);
+    if (user) {
+      return this.authService.signIn(user);
     }
+    return { status: 'error', message: 'Invalid credentials' };
+  }
 
-    @Post('signup')
-    async singUp(@Body() userDto: UserDto){
-        return await this.authService.signUp(userDto)
-    }
+  @MessagePattern(AuthMsg.REGISTER)
+  @UsePipes(new ValidationPipe())
+  async register(@Payload() registerAuthUserDto: RegisterAuthUserDto) {
+    return this.authService.signUp(registerAuthUserDto);
+  }
+
+  @MessagePattern(AuthMsg.VALIDATE_TOKEN)
+  @UsePipes(new ValidationPipe()) // Aplica el ValidationPipe
+  async validateToken(@Payload() validateTokenDto: ValidateTokenDto) { // Usa el DTO
+    return this.authService.validateAuthToken(validateTokenDto.token); // Accede al campo 'token'
+  }
+
+  @MessagePattern(AuthMsg.REFRESH_TOKEN)
+  @UsePipes(new ValidationPipe()) // Aplica el ValidationPipe
+  async refreshToken(@Payload() refreshTokenDto: RefreshTokenDto) { // Usa el DTO
+    return this.authService.refreshToken(refreshTokenDto.refreshToken); // Accede al campo 'refreshToken'
+  }
+
+  @MessagePattern(AuthMsg.LOGOUT)
+  @UsePipes(new ValidationPipe()) // Aplica el ValidationPipe
+  async logout(@Payload() logoutDto: LogoutDto) { // Usa el DTO
+    return this.authService.logout(logoutDto.accessToken); // Accede al campo 'accessToken'
+  }
 }
