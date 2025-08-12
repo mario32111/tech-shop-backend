@@ -1,8 +1,8 @@
 // microserviceAuth/src/auth/auth.service.ts
 
-import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy,RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize'; // Para inyectar modelos de Sequelize
 import { UserMsg } from 'src/common/constants'; // Asegúrate de que UserMsg esté definido
 import { ClientProxyTechShop } from 'src/common/proxy/client-proxy'; // Asegúrate de que esta ruta sea correcta
@@ -67,49 +67,58 @@ export class AuthService {
   }
 
   // Método para registrar un nuevo usuario
-  async signUp(registerAuthUserDto: RegisterAuthUserDto): Promise<any> {
-    // 1. Hashear la contraseña
-    const hashedPassword = await bcrypt.hash(registerAuthUserDto.password, 10); // 10 es el saltRounds
+async signUp(registerAuthUserDto: RegisterAuthUserDto): Promise<any> {
+    try {
+        const hashedPassword = await bcrypt.hash(registerAuthUserDto.password, 10);
 
-    // 2. Crear el usuario en la base de datos de AUTENTICACIÓN
-    const authUser = await this.authUserModel.create({
-      email: registerAuthUserDto.email,
-      username: registerAuthUserDto.username,
-      passwordHash: hashedPassword,
-      isActive: true, // O false si requieres verificación por email
-      isEmailVerified: false,
-      refreshTokens: [],
-      passwordResetTokens: []
-    });
+        const authUser = await this.authUserModel.create({
+            email: registerAuthUserDto.email,
+            username: registerAuthUserDto.username,
+            passwordHash: hashedPassword,
+            isActive: true,
+            isEmailVerified: false,
+        } as any);
 
-    if (!authUser) {
-      throw new Error('Failed to create auth user'); // Manejo de errores más robusto
+        const userProfileData = {
+            name: registerAuthUserDto.name,
+            username: registerAuthUserDto.username,
+            email: registerAuthUserDto.email,
+            authUserId: authUser.id,
+        };
+
+        const createdUserProfile = await this._clientProxyUsers
+            .send({ cmd: UserMsg.CREATE_USER_PROFILE }, userProfileData)
+            .toPromise();
+
+        if (!createdUserProfile) {
+            await authUser.destroy();
+            throw new RpcException({
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                message: 'Failed to create user profile in Users microservice',
+            });
+        }
+
+        return this.signIn(authUser);
+        
+    } catch (error) {
+        // En lugar de `instanceof`, verificamos el nombre del error
+        if (error && error.name === 'SequelizeUniqueConstraintError') {
+            throw new RpcException({
+                status: HttpStatus.CONFLICT, // 409
+                message: 'El email ya existe.',
+            });
+        }
+        
+        // Log para depuración si no es un error conocido
+        console.error('An unexpected error occurred in AuthService.signUp:', error);
+        
+        // Para cualquier otro error, lanzamos una excepción genérica
+        throw new RpcException({
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Internal server error.',
+        });
     }
-
-    // 3. Enviar un mensaje al microservicio de USUARIOS para crear el perfil
-    //    IMPORTANTE: NO envíes la contraseña hasheada al microservicio de usuarios.
-    //    Solo envía los datos de perfil que le corresponden.
-    const userProfileData = {
-      name: registerAuthUserDto.name, // Asume que RegisterAuthUserDto tiene 'name'
-      username: registerAuthUserDto.username,
-      email: registerAuthUserDto.email,
-      authUserId: authUser.id, // Enlaza el perfil con el ID del usuario de autenticación
-    };
-
-    // Envía el mensaje y espera la confirmación de creación del perfil
-    const createdUserProfile = await this._clientProxyUsers
-      .send({ cmd: UserMsg.CREATE_USER_PROFILE }, userProfileData) // Define CREATE_USER_PROFILE en UserMsg
-      .toPromise();
-
-    if (!createdUserProfile) {
-      // Si falla la creación del perfil, considera revertir la creación del authUser
-      await authUser.destroy(); // Elimina el usuario de auth si el perfil no se crea
-      throw new Error('Failed to create user profile in Users microservice');
-    }
-
-    // Opcional: Iniciar sesión automáticamente después del registro
-    return this.signIn(authUser);
-  }
+}
 
   // --- Métodos adicionales para la gestión de tokens y sesiones ---
 

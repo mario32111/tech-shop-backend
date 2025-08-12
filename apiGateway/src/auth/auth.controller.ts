@@ -13,8 +13,8 @@ import { LogoutDto } from './dto/logout.dto';
 
 
 @ApiTags('auth')
-//proteccion de endpoinds con jwt
-@UseGuards(JwtAuthGuard)
+// IMPORTANTE: Eliminamos @UseGuards(JwtAuthGuard) de aquí.
+// Las rutas que necesitan protección se protegerán individualmente.
 @Controller('api/v1/auth')
 export class AuthController {
     private _clientProxyProduct: ClientProxy;
@@ -43,21 +43,32 @@ export class AuthController {
     login(@Body() LoginUserDto: LoginUserDto): Observable<any> {
         return this.sendAndHandle<any>(AuthMsg.LOGIN, LoginUserDto);
     }
+
     @Post('register')
     register(@Body() registerUserDto: RegisterAuthUserDto): Observable<any> {
         return this.sendAndHandle<any>(AuthMsg.REGISTER, registerUserDto);
     }
 
+    // Si 'validate-token' requiere que el usuario ya tenga un token válido (e.g., para verificarlo),
+    // entonces SÍ debería estar protegido. Si es para validar un token "candidato", no.
+    // Asumo que es para validar un token existente, por lo que lo protegemos.
+    @UseGuards(JwtAuthGuard)
     @Post('validate-token')
     validateToken(@Body() tokenDto: ValidateTokenDto): Observable<any> {
         return this.sendAndHandle<any>(AuthMsg.VALIDATE_TOKEN, tokenDto);
     }
 
+    // 'refresh-token' a menudo requiere un token de refresco válido,
+    // que también podría requerir autenticación para el token de acceso.
+    @UseGuards(JwtAuthGuard)
     @Post('refresh-token')
     refreshToken(@Body() refreshTokenDto: RefreshTokenDto): Observable<any> {
         return this.sendAndHandle<any>(AuthMsg.REFRESH_TOKEN, refreshTokenDto);
     }
 
+    // 'logout' podría o no requerir un token válido, dependiendo de cómo lo implementes.
+    // Si el logout invalida el token actual, probablemente necesites el guard.
+    @UseGuards(JwtAuthGuard)
     @Post('logout')
     logout(@Body() logoutDto: LogoutDto): Observable<any> {
         return this.sendAndHandle<any>(AuthMsg.LOGOUT, logoutDto);
