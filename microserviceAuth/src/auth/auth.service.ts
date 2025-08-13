@@ -2,7 +2,7 @@
 
 import { Injectable, UnauthorizedException, Inject, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ClientProxy,RpcException } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize'; // Para inyectar modelos de Sequelize
 import { UserMsg } from 'src/common/constants'; // Asegúrate de que UserMsg esté definido
 import { ClientProxyTechShop } from 'src/common/proxy/client-proxy'; // Asegúrate de que esta ruta sea correcta
@@ -67,58 +67,58 @@ export class AuthService {
   }
 
   // Método para registrar un nuevo usuario
-async signUp(registerAuthUserDto: RegisterAuthUserDto): Promise<any> {
+  async signUp(registerAuthUserDto: RegisterAuthUserDto): Promise<any> {
     try {
-        const hashedPassword = await bcrypt.hash(registerAuthUserDto.password, 10);
+      const hashedPassword = await bcrypt.hash(registerAuthUserDto.password, 10);
 
-        const authUser = await this.authUserModel.create({
-            email: registerAuthUserDto.email,
-            username: registerAuthUserDto.username,
-            passwordHash: hashedPassword,
-            isActive: true,
-            isEmailVerified: false,
-        } as any);
+      const authUser = await this.authUserModel.create({
+        email: registerAuthUserDto.email,
+        username: registerAuthUserDto.username,
+        passwordHash: hashedPassword,
+        isActive: true,
+        isEmailVerified: false,
+      } as any);
 
-        const userProfileData = {
-            name: registerAuthUserDto.name,
-            username: registerAuthUserDto.username,
-            email: registerAuthUserDto.email,
-            authId: authUser.id,
-        };
+      const userProfileData = {
+        name: registerAuthUserDto.name,
+        username: registerAuthUserDto.username,
+        email: registerAuthUserDto.email,
+        authId: authUser.id,
+      };
 
-        const createdUserProfile = await this._clientProxyUsers
-            .send({ cmd: UserMsg.CREATE_USER_PROFILE }, userProfileData)
-            .toPromise();
+      const createdUserProfile = await this._clientProxyUsers
+        .send(UserMsg.CREATE_USER_PROFILE, userProfileData)
+        .toPromise();
 
-        if (!createdUserProfile) {
-            await authUser.destroy();
-            throw new RpcException({
-                status: HttpStatus.INTERNAL_SERVER_ERROR,
-                message: 'Failed to create user profile in Users microservice',
-            });
-        }
-
-        return this.signIn(authUser);
-        
-    } catch (error) {
-        // En lugar de `instanceof`, verificamos el nombre del error
-        if (error && error.name === 'SequelizeUniqueConstraintError') {
-            throw new RpcException({
-                status: HttpStatus.CONFLICT, // 409
-                message: 'El email ya existe.',
-            });
-        }
-        
-        // Log para depuración si no es un error conocido
-        console.error('An unexpected error occurred in AuthService.signUp:', error);
-        
-        // Para cualquier otro error, lanzamos una excepción genérica
+      if (!createdUserProfile) {
+        await authUser.destroy();
         throw new RpcException({
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: 'Internal server error.',
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Failed to create user profile in Users microservice',
         });
+      }
+
+      return this.signIn(authUser);
+
+    } catch (error) {
+      // En lugar de `instanceof`, verificamos el nombre del error
+      if (error && error.name === 'SequelizeUniqueConstraintError') {
+        throw new RpcException({
+          status: HttpStatus.CONFLICT, // 409
+          message: 'El email ya existe.',
+        });
+      }
+
+      // Log para depuración si no es un error conocido
+      console.error('An unexpected error occurred in AuthService.signUp:', error);
+
+      // Para cualquier otro error, lanzamos una excepción genérica
+      throw new RpcException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error.',
+      });
     }
-}
+  }
 
   // --- Métodos adicionales para la gestión de tokens y sesiones ---
 

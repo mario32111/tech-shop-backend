@@ -1,20 +1,27 @@
-// microservice_users/src/users/dto/create-user-profile.dto.ts
-import { IsString, IsNotEmpty, IsInt, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, IsEmail, IsOptional, IsDateString } from 'class-validator';
 
 export class CreateUserProfileDto {
     @IsString()
     @IsNotEmpty()
     name: string;
 
+    @IsString()
+    @IsNotEmpty()
+    username: string;
+
+    @IsEmail()
+    @IsNotEmpty()
+    email: string;
+
     @IsInt()
     @IsNotEmpty()
     authId: number;
 
     @IsOptional()
-    @IsDate()
-    birthDate?: Date;
+    @IsDateString()
+    birthDate?: Date; // Si se envía desde el front-end
 
     @IsOptional()
     @IsString()
-    gender?: string;
+    gender?: string; // Si se envía desde el front-end
 }

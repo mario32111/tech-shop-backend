@@ -15,7 +15,7 @@ async function bootstrap() {
 
     // Inicia el microservicio
     await app.listen();
-    console.log('Microservice Passengers is listening');
+    console.log('Microservice Auth is listening');
   } catch (err) {
     // Si ocurre un error, lo capturamos y mostramos en la consola
     console.error('Error al conectar con RabbitMQ:', err);

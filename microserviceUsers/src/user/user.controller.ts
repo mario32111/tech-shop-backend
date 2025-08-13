@@ -1,20 +1,15 @@
 import { Controller, UsePipes, ValidationPipe } from '@nestjs/common';
-import { UserDto } from './dto/user.dto';
+// import { UserDto } from './dto/user.dto'; // <-- ¡Eliminar esta línea!
 import { UserService } from './user.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserMsg } from 'src/common/constants';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 
-//aqui el controlador ya no tiene ninguna ruta
 @Controller('')
-
 export class UserController {
     constructor(private readonly userService: UserService) { }
-    //se cambian los metodos convencionalees por estos nuevos decoradores
 
-    //Este decorador define un manejador para un mensaje específico que un microservicio recibirá y procesará
     @MessagePattern(UserMsg.CREATE_USER_PROFILE)
-    //ya no se recibe un body, se recibe un payload, lo demas se mantiene igual
     @UsePipes(new ValidationPipe())
     async createUserProfile(@Payload() userProfileDto: CreateUserProfileDto) {
         return this.userService.create(userProfileDto);
@@ -28,38 +23,19 @@ export class UserController {
 
     @MessagePattern(UserMsg.FIND_ONE)
     @UsePipes(new ValidationPipe())
-
-    async findOne(@Payload() id: string) {
+    async findOne(@Payload() id: number) { // <-- Corregido: ID es un número
         return this.userService.findOne(id);
     }
 
-    //id: string, @Body() UserDto: UserDto quite esto por que ya viene dentro del payload
     @MessagePattern(UserMsg.UPDATE)
     @UsePipes(new ValidationPipe())
-
-    async update(@Payload('id') payload: any) {
-        return this.userService.update(payload.id, payload.UserDto);
+    async update(@Payload() payload: { id: number, userProfileDto: Partial<CreateUserProfileDto> }) {
+        return this.userService.update(payload.id, payload.userProfileDto);
     }
 
     @MessagePattern(UserMsg.DELETE)
     @UsePipes(new ValidationPipe())
-
-    async delete(@Payload() id: string) {
+    async delete(@Payload() id: number) { // <-- Corregido: ID es un número
         return this.userService.delete(id);
     }
-
-/*     //endpoint de validar usuario
-    @MessagePattern(UserMsg.VALID_USER)
-    @UsePipes(new ValidationPipe())
-
-    async validateUser(@Payload() payload) {
-        const user = await this.userService.findByUsername(payload.username)
-
-        if (!user) return null;
-
-        const isValidPassword = await this.userService.checkPassword(payload.password, user.password);
-
-        if (isValidPassword) return user;
-        return null;
-    } */
 }

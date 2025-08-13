@@ -9,7 +9,6 @@ export class ClientProxyTechShop {
 
     // Generar la conexión y configuración de RabbitMQ para usuarios
     clientProxyUsers(): ClientProxy {
-
         return ClientProxyFactory.create({
             transport: Transport.RMQ,
             options: {

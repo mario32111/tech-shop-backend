@@ -50,7 +50,7 @@ export class UserController {
     //En cada endpoint, ahora llamamos a this.sendAndHandle() con el patrón de mensaje y los datos correspondientes
     @Post()
     create(@Body() userDto: UserDto): Observable<IUser> {
-        return this.sendAndHandle<IUser>(UserMsg.CREATE, userDto);
+        return this.sendAndHandle<IUser>(UserMsg.CREATE_USER_PROFILE, userDto);
     }
 
     @Get()

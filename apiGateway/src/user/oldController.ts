@@ -19,7 +19,7 @@ export class UserController {
     @Post()
     create(@Body() userDto: UserDto): Observable<IUser> {
         return new Observable<IUser>((subscriber) => {
-            this._clientProxyUser.send(UserMsg.CREATE, userDto).subscribe({
+            this._clientProxyUser.send(UserMsg.CREATE_USER_PROFILE, userDto).subscribe({
                 next: (response) => {
                     console.log('Response from microservice:', response);
                     subscriber.next(response);

@@ -4,14 +4,8 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
-COPY package.json .
-COPY pnpm-lock.yaml .
+COPY package.json pnpm-lock.yaml ./
 
-RUN pnpm install --frozen-lockfile --production=false
-
-RUN npm rebuild bcrypt --unsafe-perm
+RUN pnpm install --frozen-lockfile
 
 CMD ["pnpm", "run", "start:dev"]
-
-
-
