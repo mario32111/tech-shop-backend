@@ -83,7 +83,7 @@ async signUp(registerAuthUserDto: RegisterAuthUserDto): Promise<any> {
             name: registerAuthUserDto.name,
             username: registerAuthUserDto.username,
             email: registerAuthUserDto.email,
-            authUserId: authUser.id,
+            authId: authUser.id,
         };
 
         const createdUserProfile = await this._clientProxyUsers

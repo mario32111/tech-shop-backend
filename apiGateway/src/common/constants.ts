@@ -5,7 +5,7 @@ export enum RabbitMQ{
 }
 
 export enum UserMsg {
-    CREATE='CREATE_USER',
+    CREATE_USER_PROFILE='CREATE_USER_PROFILE',
     FIND_ALL = 'FIND_USERS',
     FIND_ONE = 'FIND_USER',
     UPDATE = 'UPDATE_USER',

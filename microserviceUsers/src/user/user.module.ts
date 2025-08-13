@@ -1,20 +1,12 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { USER } from 'src/common/models/models';
-import { UserSchema } from './schema/user.schema';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { UserProfile } from './models/user-profile.model';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
-      { 
-        name: USER.name,
-        useFactory: () => {
-          return UserSchema;
-        },
-      }
-    ])
+    SequelizeModule.forFeature([UserProfile]),
   ],
   controllers: [UserController],
   providers: [UserService],

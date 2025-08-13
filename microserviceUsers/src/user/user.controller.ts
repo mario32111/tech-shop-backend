@@ -1,47 +1,58 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserMsg } from 'src/common/constants';
+import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 
 //aqui el controlador ya no tiene ninguna ruta
 @Controller('')
 
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+    constructor(private readonly userService: UserService) { }
     //se cambian los metodos convencionalees por estos nuevos decoradores
 
     //Este decorador define un manejador para un mensaje específico que un microservicio recibirá y procesará
-    @MessagePattern(UserMsg.CREATE)
+    @MessagePattern(UserMsg.CREATE_USER_PROFILE)
     //ya no se recibe un body, se recibe un payload, lo demas se mantiene igual
-    create(@Payload() UserDto: UserDto) {
-        return this.userService.create(UserDto);
+    @UsePipes(new ValidationPipe())
+    async createUserProfile(@Payload() userProfileDto: CreateUserProfileDto) {
+        return this.userService.create(userProfileDto);
     }
 
     @MessagePattern(UserMsg.FIND_ALL)
-    findAll() {
+    @UsePipes(new ValidationPipe())
+    async findAll() {
         return this.userService.findAll();
     }
 
     @MessagePattern(UserMsg.FIND_ONE)
-    findOne(@Payload() id: string) {
+    @UsePipes(new ValidationPipe())
+
+    async findOne(@Payload() id: string) {
         return this.userService.findOne(id);
     }
 
     //id: string, @Body() UserDto: UserDto quite esto por que ya viene dentro del payload
     @MessagePattern(UserMsg.UPDATE)
-    update(@Payload('id') payload: any) {
+    @UsePipes(new ValidationPipe())
+
+    async update(@Payload('id') payload: any) {
         return this.userService.update(payload.id, payload.UserDto);
     }
 
-    @MessagePattern(UserMsg.UPDATE)
-    delete(@Payload() id: string) {
+    @MessagePattern(UserMsg.DELETE)
+    @UsePipes(new ValidationPipe())
+
+    async delete(@Payload() id: string) {
         return this.userService.delete(id);
     }
 
-    //endpoint de validar usuario
+/*     //endpoint de validar usuario
     @MessagePattern(UserMsg.VALID_USER)
-    async validateUser(@Payload() payload){
+    @UsePipes(new ValidationPipe())
+
+    async validateUser(@Payload() payload) {
         const user = await this.userService.findByUsername(payload.username)
 
         if (!user) return null;
@@ -50,5 +61,5 @@ export class UserController {
 
         if (isValidPassword) return user;
         return null;
-    }
+    } */
 }

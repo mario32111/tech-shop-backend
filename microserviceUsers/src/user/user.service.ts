@@ -1,50 +1,44 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
-import { USER } from 'src/common/models/models'
 import { IUser } from 'src/common/interface/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-
+import { UserProfile } from '../user/models/user-profile.model';
+import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(USER.name) private readonly model: Model<IUser>) {}
 
-    async findByUsername(username: string){
-        return await this.model.findOne({ username });
+    constructor(
+        @InjectModel(UserProfile)
+        private userProfileModel: typeof UserProfile,
+    ) { }
+
+    async update(id: string, userProfileDto: CreateUserProfileDto): Promise<IUser | null> {
+        const userProfile = await this.userProfileModel.findByIdAndUpdate(id, userProfileDto, { new: true });
+        return userProfile;
     }
 
-    async checkPassword(password: string, passwordDB: string): Promise<boolean>{
-        return await bcrypt.compare(password, passwordDB);
-    }
-    async hashPassword(password: string): Promise<string> {
-        const salt = await bcrypt.genSalt(10);
-        return await bcrypt.hash(password, salt);
+    async 
+
+    async findByUsername(username: string) {
+        return await this.userProfileModel.findOne({ username });
     }
 
-
-    async create(userDto: UserDto): Promise<IUser> {
-        const hash = await this.hashPassword(userDto.password);
-        const newUser = new this.model({...userDto, password: hash});
-        return await newUser.save();
-    }   
+    async create(userProfileDto: CreateUserProfileDto): Promise<IUser> {
+        const userProfile = await this.userProfileModel.create(userProfileDto);
+        return userProfile;
+    }
 
     async findAll(): Promise<IUser[]> {
-        return await this.model.find();
+        return await this.userProfileModel.find();
     }
 
     async findOne(id: string): Promise<IUser | null> {
-        return await this.model.findById(id);
-    }
-
-    async update(id: string, userDto: UserDto): Promise<IUser | null> {
-        const hash = await this.hashPassword(userDto.password)
-        const user = {...userDto, password: hash}
-        return await this.model.findByIdAndUpdate(id, user, {new: true}); 
+        return await this.userProfileModel.findById(id);
     }
 
     async delete(id: string): Promise<{ status: number, message: string }> {
-        await this.model.findByIdAndDelete(id);
+        await this.userProfileModel.findByIdAndDelete(id);
         return { status: HttpStatus.OK, message: 'User deleted successfully' };
     }
 
