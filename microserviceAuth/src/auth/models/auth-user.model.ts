@@ -38,7 +38,7 @@ export class AuthUser extends Model<InferAttributes<AuthUser>, InferCreationAttr
     allowNull: false,
     field: 'email', // Column name in the DB if different from property name
   })
-  email: string;
+  declare email: string;
 
   @Unique // Ensures username is unique
   @Column({

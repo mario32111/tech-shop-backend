@@ -1,6 +1,6 @@
 // microserviceAuth/src/auth/auth.controller.ts
 
-import { Controller, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, UsePipes, ValidationPipe, UnauthorizedException } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
 import { RegisterAuthUserDto } from './dto/register-auth-user.dto';
@@ -12,17 +12,31 @@ import { AuthMsg } from 'src/common/constants';
 
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
+
+
+
+  @MessagePattern(AuthMsg.VALIDATE_USER_BY_ID)
+  async validateUserById(@Payload('userId') userId: number): Promise<{ id: number; email: string; username: string; isActive: boolean } | null> {
+    console.log('Microservice received validation request for user ID:', userId);
+    const user = await this.authService.validateUserById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found or is inactive.');
+    }
+    return user;
+  }
 
   @MessagePattern(AuthMsg.LOGIN)
   @UsePipes(new ValidationPipe())
   async login(@Payload() loginUserDto: LoginUserDto) {
+    console.log('Login attempt:', loginUserDto.email);
     const user = await this.authService.validateUser(loginUserDto.email, loginUserDto.password);
     if (user) {
       return this.authService.signIn(user);
     }
     return { status: 'error', message: 'Invalid credentials' };
   }
+
 
   @MessagePattern(AuthMsg.REGISTER)
   @UsePipes(new ValidationPipe())
@@ -32,8 +46,18 @@ export class AuthController {
 
   @MessagePattern(AuthMsg.VALIDATE_TOKEN)
   @UsePipes(new ValidationPipe()) // Aplica el ValidationPipe
-  async validateToken(@Payload() validateTokenDto: ValidateTokenDto) { // Usa el DTO
-    return this.authService.validateAuthToken(validateTokenDto.token); // Accede al campo 'token'
+  async validateToken(@Payload('token') token: string) {
+    // Llama al servicio de autenticación
+    const validationResult = await this.authService.validateAuthToken(token);
+    console.log('Token validation result:', validationResult);
+    if (!validationResult.isValid) {
+      // Si la validación secundaria falla, lanza una excepción
+      // Esto se convertirá en un error HTTP si el API Gateway lo maneja
+      throw new UnauthorizedException(validationResult.reason);
+    }
+
+    // Si la validación secundaria es exitosa, devuelve el payload
+    return validationResult.payload;
   }
 
   @MessagePattern(AuthMsg.REFRESH_TOKEN)
@@ -45,6 +69,7 @@ export class AuthController {
   @MessagePattern(AuthMsg.LOGOUT)
   @UsePipes(new ValidationPipe()) // Aplica el ValidationPipe
   async logout(@Payload() logoutDto: LogoutDto) { // Usa el DTO
+    console.log('Logging out user:', logoutDto);
     return this.authService.logout(logoutDto.accessToken); // Accede al campo 'accessToken'
   }
 }

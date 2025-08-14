@@ -32,8 +32,25 @@ export class AuthService {
     this._clientProxyUsers = this.clientProxy.clientProxyUsers();
   }
 
+  async validateUserById(userId: number): Promise<{ id: number; email: string; username: string; isActive: boolean } | null> {
+    const authUser = await this.authUserModel.findByPk(userId);
+    // Verificamos si el usuario existe y si está activo.
+    if (!authUser || !authUser.get('isActive')) {
+      return null;
+    }
+    console.log('User found:', authUser);
+
+    return {
+      id: authUser.get('id'),
+      email: authUser.get('email'),
+      username: authUser.get('username'),
+      isActive: authUser.get('isActive'),
+    };
+  }
+
   // Método para validar las credenciales de usuario (Login)
   async validateUser(email: string, password: string): Promise<AuthUser | null> {
+    console.log('Validating userrr:', email);
     // 1. Buscar el usuario en la base de datos de AUTENTICACIÓN
     const authUser = await this.authUserModel.findOne({ where: { email } });
 
@@ -41,15 +58,17 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // ✨ CORRECCIÓN AQUÍ: Obtén el valor del hash de forma segura
+    const storedHash = authUser.get('passwordHash');
+
     // 2. Comparar la contraseña proporcionada con el hash almacenado
-    const isPasswordValid = await bcrypt.compare(password, authUser.passwordHash);
+    const isPasswordValid = await bcrypt.compare(password, storedHash);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Devolver el usuario de autenticación (sin el hash de la contraseña)
-    // Puedes devolver solo un subconjunto de datos si no necesitas todo el modelo
+    // Devolver el usuario de autenticación
     return authUser;
   }
 
@@ -124,11 +143,15 @@ export class AuthService {
 
   async validateAuthToken(token: string): Promise<any> {
     try {
+      console.log('Validating auth token:', token);
       const payload = this.jwtService.verify(token);
       // Aquí podrías añadir lógica para verificar si el token está en una blacklist
       // o si el usuario asociado (payload.sub) está activo en la DB de Auth.
       const authUser = await this.authUserModel.findByPk(payload.sub);
-      if (!authUser || !authUser.isActive) {
+      console.log('Auth user found:', authUser);
+      const isActive = authUser ? authUser.get('isActive') : false;
+
+      if (!authUser || !isActive) {
         return { isValid: false, reason: 'User not active or not found' };
       }
       return { isValid: true, payload };
@@ -181,6 +204,7 @@ export class AuthService {
 
 
   async logout(accessToken: string): Promise<{ message: string }> {
+    console.log('Logging out user with access token:', accessToken);
     // Lógica para invalidar el access token (si usas una blacklist de JWTs)
     // O simplemente marcar el refresh token como revocado si es un logout completo
     try {

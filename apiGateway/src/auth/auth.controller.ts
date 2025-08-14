@@ -49,14 +49,6 @@ export class AuthController {
         return this.sendAndHandle<any>(AuthMsg.REGISTER, registerUserDto);
     }
 
-    // Si 'validate-token' requiere que el usuario ya tenga un token válido (e.g., para verificarlo),
-    // entonces SÍ debería estar protegido. Si es para validar un token "candidato", no.
-    // Asumo que es para validar un token existente, por lo que lo protegemos.
-    @UseGuards(JwtAuthGuard)
-    @Post('validate-token')
-    validateToken(@Body() tokenDto: ValidateTokenDto): Observable<any> {
-        return this.sendAndHandle<any>(AuthMsg.VALIDATE_TOKEN, tokenDto);
-    }
 
     // 'refresh-token' a menudo requiere un token de refresco válido,
     // que también podría requerir autenticación para el token de acceso.
@@ -71,6 +63,7 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Post('logout')
     logout(@Body() logoutDto: LogoutDto): Observable<any> {
-        return this.sendAndHandle<any>(AuthMsg.LOGOUT, logoutDto);
+        const res = this.sendAndHandle<any>(AuthMsg.LOGOUT, logoutDto);
+        return res;
     }
 }
