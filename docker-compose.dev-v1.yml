@@ -61,8 +61,8 @@ services:
     image: rabbitmq:3-management
     container_name: rmq_dev
     ports:
-      - "5672:5672"   # Puerto AMQP para la comunicación de los microservicios
-      - "15672:15672" # Puerto para el panel de administración web
+      - "5672:5672"
+      - "15672:15672"
     restart: always
     networks:
       - ms_nestjs_dev
@@ -100,7 +100,6 @@ services:
     networks:
       - ms_nestjs_dev
 
-  # --- Servicio de pgAdmin ---
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin_dev

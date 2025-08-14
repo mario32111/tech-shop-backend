@@ -6,6 +6,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Endpoint dummy para /wpad.dat (evita error 404 en logs)
+  app.getHttpAdapter().get('/wpad.dat', (req, res) => {
+    res.status(204).send(); // Sin contenido
+  });
+
   //excepcion de filtros globales
   app.useGlobalFilters(new AllExceptionFilter());
   app.useGlobalInterceptors(new TimeOutInterceptor());
@@ -25,6 +31,6 @@ async function bootstrap() {
       filter: true
     }
   })
-   await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
