@@ -53,6 +53,7 @@ export class UserController {
         return this.sendAndHandle<IUser>(UserMsg.CREATE_USER_PROFILE, userDto);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get()
     findAll(): Observable<IUser[]> {
         return this.sendAndHandle<IUser[]>(UserMsg.FIND_ALL, '');
