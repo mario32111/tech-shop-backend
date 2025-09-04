@@ -26,12 +26,14 @@ export class UserController {
     async findOne(@Payload() id: number) { // <-- Corregido: ID es un número
         return this.userService.findOne(id);
     }
-
     @MessagePattern(UserMsg.UPDATE)
-    @UsePipes(new ValidationPipe())
-    async update(@Payload() payload: { id: number, userProfileDto: Partial<CreateUserProfileDto> }) {
-        return this.userService.update(payload.id, payload.userProfileDto);
+    async update(
+        @Payload() payload: { id: number, userDto: Partial<CreateUserProfileDto> }
+    ) {
+        console.log(payload);
+        return this.userService.update(+payload.id, payload.userDto);
     }
+
 
     @MessagePattern(UserMsg.DELETE)
     @UsePipes(new ValidationPipe())

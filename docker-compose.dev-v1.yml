@@ -11,7 +11,8 @@ services:
     ports:
       - 80:3000
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     networks:
       - ms_nestjs_dev
     volumes:
@@ -27,8 +28,10 @@ services:
       dockerfile: Dockerfile
     env_file: .env
     depends_on:
-      - rabbitmq
-      - postgres_auth
+      rabbitmq:
+        condition: service_healthy
+      postgres_auth:
+        condition: service_healthy
     restart: always
     networks:
       - ms_nestjs_dev
@@ -36,7 +39,6 @@ services:
       - ./microserviceAuth:/app
       - /app/node_modules
     command: pnpm run start:dev
-
 
   microservice-users:
     image: microservice-users:dev
@@ -46,8 +48,10 @@ services:
       dockerfile: Dockerfile
     env_file: .env
     depends_on:
-      - rabbitmq
-      - postgres_users
+      rabbitmq:
+        condition: service_healthy
+      postgres_users:
+        condition: service_healthy
     restart: always
     networks:
       - ms_nestjs_dev
@@ -55,7 +59,6 @@ services:
       - ./microserviceUsers:/app
       - /app/node_modules
     command: pnpm run start:dev
-
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -66,8 +69,11 @@ services:
     restart: always
     networks:
       - ms_nestjs_dev
-
-
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   postgres_auth:
     image: postgres:latest
@@ -83,7 +89,11 @@ services:
       - 5432
     networks:
       - ms_nestjs_dev
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   postgres_users:
     image: postgres:latest
@@ -99,6 +109,11 @@ services:
       - 5432
     networks:
       - ms_nestjs_dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4
@@ -110,14 +125,16 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - postgres_auth
+      postgres_auth:
+        condition: service_healthy
+      postgres_users:
+        condition: service_healthy
     networks:
       - ms_nestjs_dev
 
 volumes:
   postgres_auth_data_dev:
   postgres_users_data_dev:
-
 
 networks:
   ms_nestjs_dev:
