@@ -1,12 +1,16 @@
-export enum RabbitMQ{
-    FlightQueue = 'flights'
+export enum RabbitMQ {
+    ProductQueue = 'products'
 }
 
-export enum FlightMsg{
-    CREATE='CREATE_FLIGHT',
-    FIND_ALL = 'FIND_FLIGHTS',
-    FIND_ONE = 'FIND_FLIGHT',
-    UPDATE = 'UPDATE_FLIGHT',
-    DELETE= 'DELETE_FLIGHT',
-    ADD_PASSENGER= 'ADD_PASSENGER'
+export enum ProductMsg{
+    CREATE='CREATE_PRODUCT',
+    FIND_ALL = 'FIND_PRODUCTS',
+    FIND_ONE = 'FIND_PRODUCT',
+    UPDATE = 'UPDATE_PRODUCT',
+    DELETE= 'DELETE_PRODUCT',
+    FIND_BY_CATEGORY = 'FIND_PRODUCTS_BY_CATEGORY',
+    FIND_BY_NAME = 'FIND_PRODUCTS_BY_NAME',
+    FIND_BY_PRICE = 'FIND_PRODUCTS_BY_PRICE',
+    FIND_BY_ID = 'FIND_PRODUCTS_BY_ID',
+    FIND_BY_RATING = 'FIND_PRODUCTS_BY_RATING',
 }

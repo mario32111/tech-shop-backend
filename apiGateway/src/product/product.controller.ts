@@ -35,26 +35,31 @@ export class ProductController {
         });
     }
 
+    @UseGuards(JwtAuthGuard)
     @Post()
     create(@Body() flighDto: ProductDto): Observable<IProduct> {
         return this.sendAndHandle<IProduct>(ProductMsg.CREATE, flighDto);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get()
     findAll(): Observable<IProduct[]> {
         return this.sendAndHandle<IProduct[]>(ProductMsg.FIND_ALL, '');
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get(':id')
     findOne(@Param('id') id: string): Observable<IProduct> {
         return this.sendAndHandle<IProduct>(ProductMsg.FIND_ONE, id);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Put(':id')
     update(@Param('id') id: string, @Body() flighDto: ProductDto): Observable<IProduct> {
         return this.sendAndHandle<IProduct>(ProductMsg.UPDATE, { id, flighDto });
     }
 
+    @UseGuards(JwtAuthGuard)
     @Delete(':id')
     delete(@Param('id') id: string): Observable<any> {
         return this.sendAndHandle<any>(ProductMsg.DELETE, id);

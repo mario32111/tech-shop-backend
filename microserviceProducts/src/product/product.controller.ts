@@ -1,11 +1,11 @@
 import { Body, Controller, Post, Get, Param, Put, Delete } from '@nestjs/common';
 import { FlightDto } from './dto/flight.dto';
-import { FlightService } from './flight.service';
+import { FlightService } from './product.service';
 import { FlightMsg } from 'src/common/constants';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 //aqui ya no se usa el servicio de pasajeros, si no que se manda a llamar al microservicio
 @Controller()
-export class FlightController {
+export class PoductController {
     constructor(
         private readonly flightService: FlightService,
     ) { }

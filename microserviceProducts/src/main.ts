@@ -9,11 +9,11 @@ async function bootstrap() {
       transport: Transport.RMQ,
       options: {
         urls: [process.env.AMQP_URL], // URL de RabbitMQ desde la variable de entorno
-        queue: RabbitMQ.FlightQueue,    // Nombre de la cola que estás utilizando
+        queue: RabbitMQ.ProductQueue,    // Nombre de la cola que estás utilizando
       },
     });
 
   await app.listen();
-  console.log("Microservice Flights is listen")
+  console.log("Microservice Products is listen")
 }
 bootstrap();
