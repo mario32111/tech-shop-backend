@@ -14,11 +14,11 @@ import {
     BelongsTo,
 } from 'sequelize-typescript';
 import { InferCreationAttributes, CreationOptional, InferAttributes } from 'sequelize';
-import { Dimensions } from './Dimensions';
-import { Review } from './Review';
-import { Meta } from './Meta';
-import { ProductImage } from './ProductImage';
-import { Category } from './category.modeltegory'; // ¡Importa el nuevo modelo!
+import { Dimensions } from './dimentions.model';
+import { Review } from './review.model';
+import { Meta } from './meta.model';
+import { ProductImage } from './productImages.model';
+import { Category } from './category.model'; // ¡Importa el nuevo modelo!
 
 @Table({
     tableName: 'products',

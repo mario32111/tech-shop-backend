@@ -1,7 +1,7 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreateUserProfileDto } from './dto/create-user-profile.dto';
+//import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { FindOptions } from 'sequelize'; // Importa FindOptions para la tipificación correcta
 import { ProductImage } from './models/productImages.model';
 import { Review } from './models/review.model';

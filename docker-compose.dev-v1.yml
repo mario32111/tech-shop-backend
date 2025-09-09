@@ -60,25 +60,25 @@ services:
       - /app/node_modules
     command: pnpm run start:dev
 
-    microservice-products:
-      image: microservice-products:dev
-      container_name: microservice-products_dev
-      build:
-        context: ./microserviceProducts
-        dockerfile: Dockerfile
-      env_file: .env
-      depends_on:
-        rabbitmq:
-          condition: service_healthy
-        postgres_users:
-          condition: service_healthy
-      restart: always
-      networks:
-        - ms_nestjs_dev
-      volumes:
-        - ./microserviceProducts:/app
-        - /app/node_modules
-      command: pnpm run start:dev
+  microservice-products:
+    image: microservice-products:dev
+    container_name: microservice-products_dev
+    build:
+      context: ./microserviceProducts
+      dockerfile: Dockerfile
+    env_file: .env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres_users:
+        condition: service_healthy
+    restart: always
+    networks:
+      - ms_nestjs_dev
+    volumes:
+      - ./microserviceProducts:/app
+      - /app/node_modules
+    command: pnpm run start:dev
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -175,6 +175,7 @@ services:
 volumes:
   postgres_auth_data_dev:
   postgres_users_data_dev:
+  postgres_products_data_dev:
 
 networks:
   ms_nestjs_dev:

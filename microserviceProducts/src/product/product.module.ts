@@ -3,8 +3,6 @@ import { PoductController } from './product.controller';
 import { ProductService } from './product.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FLIGHT, PASSENGER } from 'src/common/models/models';
-import { FlightSchema } from './schema/flight.schema';
-import { PassengerSchema } from './schema/passenger.schema';
 import { ProductImage } from './models/productImages.model';
 import { Review } from './models/review.model';
 import { Dimensions } from './models/dimentions.model';

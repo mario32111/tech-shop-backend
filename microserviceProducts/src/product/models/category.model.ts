@@ -9,7 +9,7 @@ import {
     HasMany,
 } from 'sequelize-typescript';
 import { InferCreationAttributes, CreationOptional, InferAttributes } from 'sequelize';
-import { Product } from './Product';
+import { Product } from './product.model';
 
 @Table({
     tableName: 'categories',
