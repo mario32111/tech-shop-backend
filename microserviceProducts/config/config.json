@@ -1,12 +1,12 @@
 {
-"development": {
-  "username": "user_products",
-  "password": "password_products",
-  "database": "products_db",
-  "host": "localhost",
-  "port": 5432,
-  "dialect": "postgres"
-},
+  "development": {
+    "host": "postgres_products",
+    "port": 5432,
+    "username": "user_products",
+    "password": "password_products",
+    "database": "products_db",
+    "dialect": "postgres"
+  },
   "test": {
     "username": "user_products",
     "password": "password_products",

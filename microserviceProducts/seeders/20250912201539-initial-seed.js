@@ -4,6 +4,7 @@
 module.exports = {
 
   async up (queryInterface, Sequelize) {
+    console.log('Seeding initial data...');
     // Insertar categorías
     await queryInterface.bulkInsert('categories', [
       { id: 1, name: 'Electrónica' },
