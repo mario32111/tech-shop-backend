@@ -8,6 +8,8 @@ import { Meta } from './models/meta.model';
 import { Category } from './models/category.model';
 import { Product } from './models/product.model';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { PatchProductDto } from './dto/patch-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -58,5 +60,49 @@ export class ProductService {
             ],
         });
     }
+
+    async findOne(id: number): Promise<Product> {
+        const product = await this.productsModel.findOne({
+            where: { id },
+            include: [
+                { model: Review },
+                { model: ProductImage },
+                { model: Dimensions },
+                { model: Meta },
+                { model: Category },
+            ],
+        });
+        if (!product) {
+            throw new RpcException({
+                status: HttpStatus.NOT_FOUND,
+                message: `Producto con id ${id} no encontrado`,
+            });
+        }
+        return product;
+    }
     
+    async update(id: number, productDto: UpdateProductDto): Promise<Product> {
+        const product = await this.findOne(id);
+        if (!product) {
+            throw new RpcException({
+                status: HttpStatus.NOT_FOUND,
+                message: `Producto con id ${id} no encontrado`,
+            });
+        }
+        await product.update(productDto as any);
+        return product;
+
+    }
+
+    async partialUpdate(id: number, productDto: Partial<PatchProductDto>): Promise<Product> {
+        const product = await this.findOne(id);
+        if (!product) {
+            throw new RpcException({
+                status: HttpStatus.NOT_FOUND,
+                message: `Producto con id ${id} no encontrado`,
+            });
+        }
+        await product.update(productDto as any);
+        return product;
+    }
 }

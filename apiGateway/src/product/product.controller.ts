@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Patch, ValidationPipe } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ClientProxyTechShop } from 'src/common/proxy/client-proxy';
 import { ProductDto } from './dto/product.dto';
@@ -55,9 +55,16 @@ export class ProductController {
 
     @UseGuards(JwtAuthGuard)
     @Put(':id')
-    update(@Param('id') id: string, @Body() flighDto: ProductDto): Observable<IProduct> {
-        return this.sendAndHandle<IProduct>(ProductMsg.UPDATE, { id, flighDto });
+    update(@Param('id') id: string, @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) productDto: ProductDto): Observable<IProduct> {
+        return this.sendAndHandle<IProduct>(ProductMsg.UPDATE, { id, productDto });
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch(':id')
+    partialUpdate(@Param('id') id: string, @Body() productDto: ProductDto): Observable<IProduct> {
+        return this.sendAndHandle<IProduct>(ProductMsg.PARTIAL_UPDATE, { id, productDto });
+    }
+
 
     @UseGuards(JwtAuthGuard)
     @Delete(':id')
