@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsArray, IsInt, ValidateNested } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional, IsArray, IsInt, ValidateNested, IsDefined } from 'class-validator';
 
 class DimensionsDto {
     @ApiProperty()
@@ -32,12 +32,13 @@ class ImageDto {
     url: string;
 }
 
-export class ProductDto {
+export class UpdateProductDto {
 
     @ApiProperty()
+    @IsDefined()
     @IsString()
-    @IsOptional()
-    title?: string;
+    @IsNotEmpty()
+    title: string;
 
     @ApiProperty()
     @IsString()
@@ -45,30 +46,35 @@ export class ProductDto {
     description?: string;
 
     @ApiProperty()
+    @IsDefined()
     @IsInt()
     @IsNotEmpty()
     @Type(() => Number)
     categoryId: number;
 
     @ApiProperty()
+    @IsDefined()
     @IsNumber()
     @IsNotEmpty()
     @Type(() => Number)
     price: number;
 
     @ApiProperty()
+    @IsDefined()
     @IsNumber()
     @IsNotEmpty()
     @Type(() => Number)
     discountPercentage: number;
 
     @ApiProperty()
+    @IsDefined()
     @IsNumber()
     @IsNotEmpty()
     @Type(() => Number)
     rating: number;
 
     @ApiProperty()
+    @IsDefined()
     @IsInt()
     @IsNotEmpty()
     @Type(() => Number)
@@ -80,16 +86,19 @@ export class ProductDto {
     tags?: string[];
 
     @ApiProperty()
+    @IsDefined()
     @IsString()
     @IsNotEmpty()
     brand: string;
 
     @ApiProperty()
+    @IsDefined()
     @IsString()
     @IsNotEmpty()
     sku: string;
 
     @ApiProperty()
+    @IsDefined()
     @IsInt()
     @IsNotEmpty()
     @Type(() => Number)
@@ -106,6 +115,7 @@ export class ProductDto {
     shippingInformation?: string;
 
     @ApiProperty()
+    @IsDefined()
     @IsString()
     @IsNotEmpty()
     availabilityStatus: string;
@@ -116,12 +126,14 @@ export class ProductDto {
     returnPolicy?: string;
 
     @ApiProperty()
+    @IsDefined()
     @IsInt()
     @IsNotEmpty()
     @Type(() => Number)
     minimumOrderQuantity: number;
 
     @ApiProperty()
+    @IsDefined()
     @IsString()
     @IsNotEmpty()
     thumbnail: string;

@@ -5,74 +5,80 @@ import { IsString, IsNotEmpty, IsNumber, IsOptional, IsArray, IsInt, ValidateNes
 class DimensionsDto {
     @ApiProperty()
     @IsNumber()
-    width: number;
+    @IsOptional()
+    width?: number;
 
     @ApiProperty()
     @IsNumber()
-    height: number;
+    @IsOptional()
+    height?: number;
 
     @ApiProperty()
     @IsNumber()
-    depth: number;
+    @IsOptional()
+    depth?: number;
 }
 
 class MetaDto {
     @ApiProperty()
     @IsString()
-    barcode: string;
+    @IsOptional()
+    barcode?: string;
 
     @ApiProperty()
     @IsString()
-    qrCode: string;
+    @IsOptional()
+    qrCode?: string;
 }
 
 class ImageDto {
     @ApiProperty()
     @IsString()
-    url: string;
+    @IsOptional()
+    url?: string;
 }
 
-export class ProductDto {
+export class PatchProductDto {
 
     @ApiProperty()
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     title?: string;
 
     @ApiProperty()
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     description?: string;
 
     @ApiProperty()
     @IsInt()
-    @IsNotEmpty()
+    @IsOptional()
     @Type(() => Number)
-    categoryId: number;
+    categoryId?: number;
 
     @ApiProperty()
     @IsNumber()
-    @IsNotEmpty()
+    @IsOptional()
     @Type(() => Number)
-    price: number;
+    price?: number;
 
     @ApiProperty()
     @IsNumber()
-    @IsNotEmpty()
+    @IsOptional()
     @Type(() => Number)
-    discountPercentage: number;
+    discountPercentage?: number;
 
     @ApiProperty()
     @IsNumber()
-    @IsNotEmpty()
+    @IsOptional()
     @Type(() => Number)
-    rating: number;
+    rating?: number;
 
     @ApiProperty()
     @IsInt()
-    @IsNotEmpty()
+    @IsOptional()
     @Type(() => Number)
-    stock: number;
+    stock?: number;
 
     @ApiProperty()
     @IsArray()
@@ -81,19 +87,19 @@ export class ProductDto {
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
-    brand: string;
+    @IsOptional()
+    brand?: string;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
-    sku: string;
+    @IsOptional()
+    sku?: string;
 
     @ApiProperty()
     @IsInt()
-    @IsNotEmpty()
+    @IsOptional()
     @Type(() => Number)
-    weight: number;
+    weight?: number;
 
     @ApiProperty()
     @IsString()
@@ -107,8 +113,8 @@ export class ProductDto {
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
-    availabilityStatus: string;
+    @IsOptional()
+    availabilityStatus?: string;
 
     @ApiProperty()
     @IsString()
@@ -117,14 +123,14 @@ export class ProductDto {
 
     @ApiProperty()
     @IsInt()
-    @IsNotEmpty()
+    @IsOptional()
     @Type(() => Number)
-    minimumOrderQuantity: number;
+    minimumOrderQuantity?: number;
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
-    thumbnail: string;
+    @IsOptional()
+    thumbnail?: string;
 
     @ApiProperty({ type: () => DimensionsDto })
     @IsOptional()
