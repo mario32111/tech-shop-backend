@@ -1,89 +1,159 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsArray, IsInt } from 'class-validator';
+import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import { IsString, IsNotEmpty, IsNumber, IsOptional, IsArray, IsInt, ValidateNested, IsDefined } from 'class-validator';
+
+class DimensionsDto {
+    @ApiProperty()
+    @IsNumber()
+    width: number;
+
+    @ApiProperty()
+    @IsNumber()
+    height: number;
+
+    @ApiProperty()
+    @IsNumber()
+    depth: number;
+}
+
+class MetaDto {
+    @ApiProperty()
+    @IsString()
+    barcode: string;
+
+    @ApiProperty()
+    @IsString()
+    qrCode: string;
+}
+
+class ImageDto {
+    @ApiProperty()
+    @IsString()
+    url: string;
+}
 
 export class UpdateProductDto {
-  @IsString()
-  @IsNotEmpty()
-  title: string;
 
-  @IsString()
-  @IsOptional()
-  description?: string;
+    @ApiProperty()
+    @IsDefined()
+    @IsString()
+    @IsNotEmpty()
+    title: string;
 
-  @IsInt()
-  @IsNotEmpty()
-  categoryId: number;
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    description?: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  price: number;
+    @ApiProperty()
+    @IsDefined()
+    @IsInt()
+    @IsNotEmpty()
+    @Type(() => Number)
+    categoryId: number;
 
-  @IsNumber()
-  @IsNotEmpty()
-  discountPercentage: number;
+    @ApiProperty()
+    @IsDefined()
+    @IsNumber()
+    @IsNotEmpty()
+    @Type(() => Number)
+    price: number;
 
-  @IsNumber()
-  @IsNotEmpty()
-  rating: number;
+    @ApiProperty()
+    @IsDefined()
+    @IsNumber()
+    @IsNotEmpty()
+    @Type(() => Number)
+    discountPercentage: number;
 
-  @IsInt()
-  @IsNotEmpty()
-  stock: number;
+    @ApiProperty()
+    @IsDefined()
+    @IsNumber()
+    @IsNotEmpty()
+    @Type(() => Number)
+    rating: number;
 
-  @IsArray()
-  @IsOptional()
-  tags?: string[];
+    @ApiProperty()
+    @IsDefined()
+    @IsInt()
+    @IsNotEmpty()
+    @Type(() => Number)
+    stock: number;
 
-  @IsString()
-  @IsNotEmpty()
-  brand: string;
+    @ApiProperty()
+    @IsArray()
+    @IsOptional()
+    tags?: string[];
 
-  @IsString()
-  @IsNotEmpty()
-  sku: string;
+    @ApiProperty()
+    @IsDefined()
+    @IsString()
+    @IsNotEmpty()
+    brand: string;
 
-  @IsInt()
-  @IsNotEmpty()
-  weight: number;
+    @ApiProperty()
+    @IsDefined()
+    @IsString()
+    @IsNotEmpty()
+    sku: string;
 
-  @IsString()
-  @IsOptional()
-  warrantyInformation?: string;
+    @ApiProperty()
+    @IsDefined()
+    @IsInt()
+    @IsNotEmpty()
+    @Type(() => Number)
+    weight: number;
 
-  @IsString()
-  @IsOptional()
-  shippingInformation?: string;
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    warrantyInformation?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  availabilityStatus: string;
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    shippingInformation?: string;
 
-  @IsString()
-  @IsOptional()
-  returnPolicy?: string;
+    @ApiProperty()
+    @IsDefined()
+    @IsString()
+    @IsNotEmpty()
+    availabilityStatus: string;
 
-  @IsInt()
-  @IsNotEmpty()
-  minimumOrderQuantity: number;
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    returnPolicy?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  thumbnail: string;
+    @ApiProperty()
+    @IsDefined()
+    @IsInt()
+    @IsNotEmpty()
+    @Type(() => Number)
+    minimumOrderQuantity: number;
 
-  // Relaciones anidadas (opcional, según tu lógica de negocio)
-  @IsOptional()
-  dimensions?: {
-    width: number;
-    height: number;
-    depth: number;
-  };
+    @ApiProperty()
+    @IsDefined()
+    @IsString()
+    @IsNotEmpty()
+    thumbnail: string;
 
-  @IsOptional()
-  meta?: {
-    barcode: string;
-    qrCode: string;
-  };
+    @ApiProperty({ type: () => DimensionsDto })
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => DimensionsDto)
+    dimensions?: DimensionsDto;
 
-  @IsOptional()
-  @IsArray()
-  images?: { url: string }[];
+    @ApiProperty({ type: () => MetaDto })
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => MetaDto)
+    meta?: MetaDto;
+
+    @ApiProperty({ type: () => [ImageDto] })
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ImageDto)
+    images?: ImageDto[];
 }

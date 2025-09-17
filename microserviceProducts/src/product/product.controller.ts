@@ -1,10 +1,12 @@
-import { Body, Controller, Post, Get, Param, Put, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Put, Delete, UsePipes, ValidationPipe, HttpStatus } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductMsg } from 'src/common/constants';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PatchProductDto } from './dto/patch-product.dto';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 //aqui ya no se usa el servicio de pasajeros, si no que se manda a llamar al microservicio
 @Controller()
 export class PoductController {
@@ -28,6 +30,8 @@ export class PoductController {
         return this.productService.findOne(id);
     }
 
+
+    //aqui al ser dos parametros se usa doble payload
     @MessagePattern(ProductMsg.UPDATE)
     @UsePipes(new ValidationPipe({
         whitelist: true,
@@ -35,10 +39,11 @@ export class PoductController {
         transform: true,
         skipMissingProperties: false,
     }))
-    async updateProduct(@Payload() data: { id: number, productDto: UpdateProductDto }) {
-        const { id, productDto } = data;
-        console.log('Updating product with ID:', id);
-        console.log('Update data:', productDto);
+    async updateProduct(
+        @Payload('id') id: number,
+        @Payload('productDto') productDto: UpdateProductDto,
+    ) {
+
         return this.productService.update(id, productDto);
     }
 
